@@ -7,12 +7,14 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 
-def curve_by_deflection(origin, TP1, intersection_angle_radians, chainage_increment, n_points, angle_output='DMS'):
-    R = horizontal_distance(origin, TP1)
-    total_arc_length = R * intersection_angle_radians
-
-    #TP1 -> origin
-    initial_azimuth = np.arctan2(origin[0] - TP1[0], origin[1] - TP1[1]) % (2 * np.pi)
+def curve_by_deflection(origin=False, TP1=False, intersection_angle_radians=False, R=False, azimuth_IPtoOrigin=False, chainage_increment=5, n_points=10, angle_output='DMS'):
+    if origin and TP1 and intersection_angle_radians:
+        R = horizontal_distance(origin, TP1)
+        total_arc_length = R * intersection_angle_radians
+        azimuth_TP1toOrigin = np.arctan2(origin[0] - TP1[0], origin[1] - TP1[1]) % (2 * np.pi)
+    else:
+        print('Cannot create curve with these inputs!')
+        return False
 
     curve_points = pd.DataFrame(columns=['Chainage', 'Arc_Distance', 'Deflection_Angle', 'Chord_Distance', 'Azimuth', 'Easting', 'Northing'])
 
@@ -22,7 +24,7 @@ def curve_by_deflection(origin, TP1, intersection_angle_radians, chainage_increm
         deflection_angle_radians = (arc_distance / (2 * R))
         deflection_angle_degrees = deflection_angle_radians * (180 / np.pi)
 
-        azimuth = initial_azimuth + deflection_angle_radians - (np.pi / 2)
+        azimuth = azimuth_TP1toOrigin + deflection_angle_radians - (np.pi / 2)
         chord_distance = (2 * R) * np.sin(deflection_angle_radians)
 
         easting = TP1[0] + (chord_distance * np.sin(azimuth))

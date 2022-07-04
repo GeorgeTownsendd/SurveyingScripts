@@ -39,6 +39,15 @@ def decdeg2dms_string(dd, round_to_nearest_int=True, pad_with_zeros=True):
     return dms_string
 
 
+def formatted_string_to_coordinates(s, form=0):
+    # 35°40′S 149°31′E / 35.66°S 149.51°E
+    if form == 0:
+        s = s.split(' / ')[1].split()
+        coordinates = (float(s[0][:s[0].index('°')]) * -1 if 'S' in s[0] else float(s[0][:s[0].index('°')]), float(s[1][:s[1].index('°')]) * -1 if 'W' in s[1] else float(s[1][:s[1].index('°')]))
+
+    return coordinates
+
+
 def clipboard_to_clipboard(sep=','):
     current_clipboard = pd.read_clipboard()
     current_clipboard.to_clipboard(sep=sep, index=False)
